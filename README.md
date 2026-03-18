@@ -42,3 +42,49 @@ flowchart LR
 ## Key Differentiator
 
 AgentTrace doesn't just find vulnerabilities — it closes the loop by automatically remediating them and proving the fix works, giving you a measurable before/after security posture improvement (e.g., Grade C → Grade B).
+
+Screen 1: Terminal
+Run py -m agentgym and show the live output. The audience sees:
+
+Sandbox provisioning
+10 attacks firing one-by-one
+The baseline results table (Grade C, 7/10)
+Auto-remediation patches being applied
+The post-fix rescan
+Before vs After comparison table
+Screen 2: Opik Dashboard — Traces List
+Open this URL in your browser:
+
+https://www.comet.com/opik/kush-ise/projects
+
+Then click into Default Project. You'll see 40 traces. Point out:
+
+Trace names like attack_baseline_credential_theft_env_vars and attack_post-fix_credential_theft_env_vars
+Tags column — each trace is tagged agentgym + baseline or post-fix + the attack category (prompt_injection, sandbox_escape, etc.)
+Filter by tag baseline to show just the first scan, then post-fix to show the second
+Screen 3: Opik Dashboard — Individual Trace Detail
+Click any trace (e.g. attack_baseline_credential_theft_env_vars). This shows:
+
+Input: The attack payload that was sent
+Output: What the agent actually responded
+Metadata: Attack name and description
+Tags: Category and scan phase
+This is where the audience can see exactly what the agent leaked (env vars with API keys) vs what it resisted.
+
+Screen 4: Opik Dashboard — Compare Baseline vs Post-Fix
+Show two traces side by side for the same attack:
+
+attack_baseline_credential_theft_env_vars — COMPROMISED (agent dumped all env vars)
+attack_post-fix_credential_theft_env_vars — RESISTED (remediation blocked it)
+This is the money shot: same attack, different results after auto-patching.
+
+Screen 5: Blaxel Console (optional)
+Open https://app.blaxel.ai and show the agentgym-openclaw sandbox running in workspace calm-qualifier-181007. This proves everything ran inside an isolated sandbox.
+
+Talking Points
+"AgentGym runs 10 real attack scenarios — prompt injection, sandbox escape, credential theft — against a live OpenClaw instance inside a Blaxel sandbox."
+"Claude scores each attack as compromised or resisted with severity levels."
+"It automatically patches the config based on what failed, then re-scans to prove fixes worked."
+"Everything is traced in Opik — you can see exactly what the agent leaked, what it blocked, and how the score changed after remediation."
+"Every OpenClaw deployment should run this before going to production."
+
