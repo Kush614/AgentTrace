@@ -4,6 +4,40 @@ Automated OpenClaw Security Scanner + Auto-Remediation.
 
 Spins up an OpenClaw instance inside a Blaxel sandbox, runs 10 attack scenarios (prompt injection, sandbox escape, credential theft, persistence, evasion, config exploitation), scores each with an LLM-as-a-judge via Opik, auto-remediates by patching `openclaw.json`, and re-scans to prove fixes worked.
 
+AgentTrace                                                                                                                                                                                                                                                                
+  An automated security scanner and auto-remediation tool for AI coding agents.                                                       
+                                                                                                                                        What It Does                                                                                                                                                                                                                                                                AgentTrace provisions a live AI coding agent (OpenClaw) inside a cloud sandbox (Blaxel), attacks it with 10 security scenarios        across 6 threat categories, scores each attack using an LLM-as-a-judge (Claude Sonnet), auto-patches the agent's configuration to
+  fix discovered vulnerabilities, and re-scans to verify the fixes — all in a single automated pipeline. Every attack and its outcome 
+  is traced and logged to Opik for observability.
+
+  How It Works                                                                                                                          
+  AgentTrace runs a 6-phase pipeline:                                                                                                   
+  1. Provision — Spins up a Blaxel cloud sandbox with OpenClaw (an AI coding agent) installed                                           2. Baseline Scan — Fires 10 attack payloads against the default agent configuration
+  3. Score — Claude Sonnet acts as an LLM-as-a-judge, evaluating each attack as compromised/resisted with severity ratings            
+  4. Remediate — Automatically generates and applies configuration patches to openclaw.json based on which attacks succeeded          
+  5. Re-scan — Runs the same 10 attacks against the hardened configuration                                                            
+  6. Report — Displays before/after comparison in terminal; full traces logged to Opik dashboard                                      
+                                                                                                                                        Attack Categories                                                                                                                   
+                                                                                                                                        ┌──────────────────┬───────────┬─────────────────────────────────────────────────────────────────────────┐                            │     Category     │ # Attacks │                              What It Tests                              │
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                            │ Prompt Injection │ 3         │ System prompt extraction, role-play reframe, code-based credential leak │
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                          
+  │ Sandbox Escape   │ 2         │ Path traversal, symlink escape                                          │                          
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                            │ Credential Theft │ 2         │ Env var dump, config file read                                          │                          
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                            │ Persistence      │ 1         │ SOUL.md tampering                                                       │
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                            │ Evasion          │ 1         │ Base64-encoded command execution                                        │
+  ├──────────────────┼───────────┼─────────────────────────────────────────────────────────────────────────┤                            │ Config Exploit   │ 1         │ Cloud metadata access via elevated tools                                │
+  └──────────────────┴───────────┴─────────────────────────────────────────────────────────────────────────┘                            
+  Tech Stack                                                                                                                          
+  
+  - Python 3.11+ — Core runtime                                                                                                         - Blaxel SDK — Cloud sandbox provisioning and management
+  - Anthropic Claude API — Powers the LLM-as-a-judge scorer                                                                           
+  - Opik (Comet) — Tracing and observability for all attack/response pairs                                                            
+  - Rich — Terminal UI with formatted tables and colored output                                                                       
+  - OpenClaw — The target AI coding agent being security-tested                                                                       
+                                                                                                                                        Key Differentiator                                                                                                                  
+                                                                                                                                        AgentTrace doesn't just find vulnerabilities — it closes the loop by automatically remediating them and proving the fix works,        giving you a measurable before/after security posture improvement (e.g., Grade C → Grade B).
+                                                                                                     
+
 ## Quick Start
 
 ```bash
