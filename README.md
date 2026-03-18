@@ -1,4 +1,9 @@
 # AgentTrace
+runs 10 real attack scenarios — prompt injection, sandbox escape, credential theft — against a live OpenClaw instance inside a Blaxel sandbox."
+"Claude scores each attack as compromised or resisted with severity levels."
+"It automatically patches the config based on what failed, then re-scans to prove fixes worked."
+"Everything is traced in Opik — you can see exactly what the agent leaked, what it blocked, and how the score changed after remediation."
+"Every OpenClaw deployment should run this before going to production."
 
 An automated security scanner and auto-remediation tool for AI coding agents.
 
