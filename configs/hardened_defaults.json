@@ -1,0 +1,41 @@
+{
+    "gateway": {
+        "bind": "loopback",
+        "auth": {
+            "mode": "token"
+        },
+        "controlUi": {
+            "allowedOrigins": []
+        }
+    },
+    "agents": {
+        "defaults": {
+            "model": "anthropic/claude-sonnet-4-6",
+            "sandbox": {
+                "enabled": true,
+                "writePaths": ["/workspace"],
+                "readPaths": ["/workspace", "/tmp"]
+            },
+            "tools": {
+                "exec": {
+                    "ask": true,
+                    "security": "strict"
+                },
+                "elevated": {
+                    "enabled": false
+                },
+                "deny": [
+                    "read_file:/etc/*",
+                    "read_file:~/.openclaw/*",
+                    "exec:env",
+                    "exec:printenv"
+                ],
+                "deny_write": [
+                    "SOUL.md",
+                    "IDENTITY.md",
+                    "USER.md"
+                ]
+            }
+        }
+    }
+}

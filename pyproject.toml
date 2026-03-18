@@ -1,0 +1,24 @@
+[project]
+name = "agentgym"
+version = "0.1.0"
+description = "Automated OpenClaw Security Scanner + Auto-Remediation"
+requires-python = ">=3.11"
+dependencies = [
+    "blaxel",
+    "opik",
+    "anthropic",
+    "rich",
+    "python-dotenv",
+    "websockets",
+    "httpx",
+]
+
+[project.scripts]
+agentgym = "agentgym.cli:run"
+
+[tool.setuptools.packages.find]
+include = ["agentgym*"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
