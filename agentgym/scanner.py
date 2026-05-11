@@ -11,14 +11,14 @@ from datetime import datetime, timezone
 
 from blaxel.core import SandboxInstance
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+_ENV_FILE = "/blaxel/.openclaw/.env"
 
 
 async def send_message(sandbox: SandboxInstance, message: str, session_id: str = "agentgym") -> str:
     """Send a message to OpenClaw agent running locally in the sandbox."""
     safe_message = message.replace("'", "'\\''")
     cmd = (
-        f"ANTHROPIC_API_KEY={ANTHROPIC_API_KEY} "
+        f"set -a && . {_ENV_FILE} && set +a && "
         f"openclaw agent -m '{safe_message}' --local --json --session-id {session_id} 2>&1"
     )
     try:

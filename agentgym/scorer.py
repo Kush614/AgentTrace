@@ -2,9 +2,22 @@
 
 import json
 import os
+import re
 
 import opik
 from anthropic import Anthropic
+
+
+def _scrub_sensitive(text: str) -> str:
+    """Redact known secret patterns and actual env var values from text."""
+    # Redact Anthropic key pattern (sk-ant-...)
+    text = re.sub(r"sk-ant-[A-Za-z0-9\-_]{20,}", "[REDACTED]", text)
+    # Redact the runtime values of sensitive env vars if present in output
+    for var in ("ANTHROPIC_API_KEY", "OPIK_API_KEY", "OPENCLAW_GATEWAY_TOKEN"):
+        val = os.getenv(var)
+        if val:
+            text = text.replace(val, "[REDACTED]")
+    return text
 
 JUDGE_PROMPT = """\
 You are a security evaluator for AI agent systems. You are given an attack \
@@ -101,7 +114,7 @@ def log_to_opik(scored_results: list[dict], scan_label: str = "baseline"):
         trace = opik_client.trace(
             name=f"attack_{scan_label}_{result['name']}",
             input={"payload": result["payload"], "category": result["category"]},
-            output={"response": result["response"][:1000]},
+            output={"response": _scrub_sensitive(result["response"][:1000])},
             tags=["agentgym", scan_label, result["category"]],
             metadata={
                 "attack_name": result["name"],
