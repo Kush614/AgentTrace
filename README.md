@@ -10,18 +10,21 @@ AgentTrace doesn't just find vulnerabilities — it **closes the loop** by autom
 
 ## How It Works
 
-AgentTrace runs a 6-phase pipeline:
+AgentTrace runs a 7-phase pipeline when policy-gate is running:
 
 ```
-Provision → Baseline Scan → Score → Remediate → Re-scan → Report
+Provision → Policy Preflight (Go) → Baseline Scan → Score → Remediate → Re-scan → Report
 ```
+
+Without policy-gate, phases 2–6 run as before.
 
 1. **Provision** — Spin up a Blaxel sandbox with a live OpenClaw instance.
-2. **Baseline Scan** — Fire 10 attack payloads against the default configuration.
-3. **Score** — Claude Sonnet judges each attack result as *compromised* or *resisted*, with severity levels.
-4. **Remediate** — Auto-patch `openclaw.json` based on which defenses failed.
-5. **Re-scan** — Re-run all 10 attacks against the hardened configuration.
-6. **Report** — Generate a before/after comparison with full Opik trace logs.
+2. **Policy Preflight** — Go `policy-gate` sidecar evaluates all 10 attacks as synthetic tool calls; reports how many would be blocked at ingress (`DENY` / `REQUIRE_APPROVAL`).
+3. **Baseline Scan** — Fire 10 attack payloads against the default configuration.
+4. **Score** — Claude Sonnet judges each attack result as *compromised* or *resisted*, with severity levels.
+5. **Remediate** — Auto-patch `openclaw.json` based on which defenses failed.
+6. **Re-scan** — Re-run all 10 attacks against the hardened configuration.
+7. **Report** — Generate a before/after comparison with full Opik trace logs.
 
 ## Attack Categories
 
@@ -36,6 +39,7 @@ Provision → Baseline Scan → Score → Remediate → Re-scan → Report
 
 ## Tech Stack
 
+- **Go 1.23** — `policy-gate` sidecar for deterministic tool-call policy enforcement (~400 LOC, p99 < 1ms local)
 - **Python 3.11+** — Core runtime
 - **Blaxel SDK** — Cloud sandbox provisioning and management
 - **Anthropic Claude API** — LLM-as-a-judge scorer
@@ -46,6 +50,10 @@ Provision → Baseline Scan → Score → Remediate → Re-scan → Report
 ## Quick Start
 
 ```bash
+# Optional but recommended: start the Go policy-gate sidecar
+cd policy-gate && go run .
+
+# In another terminal
 python -m agentgym
 ```
 

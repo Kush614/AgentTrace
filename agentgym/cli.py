@@ -25,7 +25,13 @@ from agentgym.sandbox import (  # noqa: E402
     restart_gateway,
     write_config,
 )
-from agentgym.scanner import run_scan  # noqa: E402
+from agentgym.policy_gate import (  # noqa: E402
+    gate_available,
+    preflight_attacks,
+    summarize_preflight,
+)
+from agentgym.policy_report import print_preflight  # noqa: E402
+from agentgym.scanner import build_attack_battery, run_scan  # noqa: E402
 from agentgym.scorer import compute_score, log_to_opik, score_results  # noqa: E402
 
 console = Console()
@@ -43,6 +49,25 @@ async def main():
     )
     sandbox, gateway_url = await provision()
     console.print(f"[green]>[/green] OpenClaw ready on sandbox\n")
+
+    if gate_available():
+        console.print(
+            "[bold]Phase 1.5: Policy-gate preflight (Go sidecar)...[/bold]"
+        )
+        attacks = build_attack_battery()
+        preflight = preflight_attacks(attacks, policy_profile="hardened")
+        summary = summarize_preflight(preflight)
+        print_preflight(preflight, summary)
+        console.print(
+            "[dim]policy-gate blocked "
+            f"{summary.get('DENY', 0)}/{len(attacks)} attacks before they "
+            "reached the agent[/dim]\n"
+        )
+    else:
+        console.print(
+            "[dim]Policy-gate not running — start with: "
+            "cd policy-gate && go run .[/dim]\n"
+        )
 
     # Phase 2: Baseline scan
     console.print(
